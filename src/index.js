@@ -4,49 +4,7 @@ const app = express();
 
 app.use(express.json())
 
-app.get('/curso', (req, resp) => {
 
-  //Usando query parametros (http://localhost:3001/curso?page=2&order=asc)
-  //obs: No query parametros os parametros são opcional
-
-  const query = req.query;
-
-  console.log(query);
-
-  return resp.json([{id:1,curso:'Back-End'},{id:1,curso:'Front-End'}])
-
-})
-
-app.post('/curso', (req, resp) => {
-
-  const body = req.body;
-
-
-  return resp.json(body)
-
-})
-
-app.put('/curso/:id', (req, resp) => {
-
-  //Usando get parametros (http://localhost:3001/curso/2)
-
-  const {id} = req.params;
-
-  return resp.json([{id:id,curso:'Back-End'},{id:id,curso:'Front-End'}])
-
-})
-
-app.patch('/curso/:id', (req, resp) => {
-
-  return resp.json([{id:1,curso:'Back-End'},{id:1,curso:'Front-End'}])
-
-})
-
-app.delete('/curso/:id', (req, resp) => {
-
-  return resp.json([{id:1,curso:'Back-End'},{id:1,curso:'Front-End'}])
-
-})
 
 
 app.listen(3001);
