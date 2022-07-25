@@ -28,5 +28,15 @@ app.post("/account",(request,response)=>{
   return response.status(201).json({customer:customer[customer.length-1],message:'success'});
 })
 
+app.get("/statement/:cpf",(request,response)=>{
+
+  const {cpf} = request.params;
+
+  const customers = customer.find(customers=>customers.cpf===cpf);
+
+  return response.json(customers.statement);
+
+})
+
 
 app.listen(3001);
