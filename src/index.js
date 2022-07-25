@@ -8,7 +8,6 @@ app.use(express.json());
 const customer = [];
 
 function Middlewaress(request, response, next) {
-
   const { cpf } = request.headers;
 
   const customers = customer.find((custome) => custome.cpf === cpf);
@@ -21,8 +20,21 @@ function Middlewaress(request, response, next) {
   return next();
 }
 
+function getBalente(statement) {
+
+  const balance = statement.reduce((acc, operation) => {
+    
+    if (operation.type === 'credit') {
+      return acc + operation.amount;
+    } else {
+      return acc - operation.amount;
+    }
+  }, 0);
+
+  return balance;
+}
+
 app.post('/account', (request, response) => {
-  
   const { cpf, name } = request.body;
 
   const customerAlreadyExists = customer.some(
@@ -40,14 +52,12 @@ app.post('/account', (request, response) => {
 });
 
 app.get('/statement', Middlewaress, (request, response) => {
-
   const { customers } = request;
 
   return response.json(customers.statement);
 });
 
 app.post('/deposit', Middlewaress, (request, response) => {
-
   const { description, amount } = request.body;
 
   const { customers } = request;
@@ -61,9 +71,28 @@ app.post('/deposit', Middlewaress, (request, response) => {
 
   customers.statement.push(statementOperation);
 
-  return response
-    .status(201)
-    .json({ customer: customers, message: 'success' });
+  return response.status(201).json({ customer: customers, message: 'success' });
+});
+
+app.post('/saque', Middlewaress, (request, response) => {
+  const { amount } = request.body;
+
+  const customers = request;
+
+  const balance = getBalente(customers.statement);
+
+  if (balance < amount)
+    return response.status(400).json({ error: 'Insufficient found!' });
+
+  const statementOperation = {
+    amount,
+    created_at: new Date(),
+    type: 'debit',
+  };
+
+  customers.statement.push(statementOperation);
+
+  return response.status(201).json({ customer: customers, message: 'success' });
 });
 
 app.listen(3001);
