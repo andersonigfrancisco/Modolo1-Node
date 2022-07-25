@@ -7,7 +7,7 @@ app.use(express.json());
 
 const customer = [];
 
-function Middleware(request, response, next) {
+function Middlewaress(request, response, next) {
 
   const { cpf } = request.headers;
 
@@ -16,12 +16,13 @@ function Middleware(request, response, next) {
   if (!customers)
     return response.status(400).json({ message: 'customer not found' });
 
-  requeste.customers = customers;
+  request.customers = customers;
 
   return next();
 }
 
 app.post('/account', (request, response) => {
+  
   const { cpf, name } = request.body;
 
   const customerAlreadyExists = customer.some(
@@ -38,11 +39,31 @@ app.post('/account', (request, response) => {
     .json({ customer: customer[customer.length - 1], message: 'success' });
 });
 
-app.get('/statement', Middleware, (request, response) => {
+app.get('/statement', Middlewaress, (request, response) => {
 
   const { customers } = request;
 
   return response.json(customers.statement);
+});
+
+app.post('/deposit', Middlewaress, (request, response) => {
+
+  const { description, amount } = request.body;
+
+  const { customers } = request;
+
+  const statementOperation = {
+    description,
+    amount,
+    created_at: new Date(),
+    type: 'credit',
+  };
+
+  customers.statement.push(statementOperation);
+
+  return response
+    .status(201)
+    .json({ customer: customers, message: 'success' });
 });
 
 app.listen(3001);
